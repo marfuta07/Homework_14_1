@@ -3,7 +3,6 @@ from typing import List
 from src.product import Product
 from src.category import Category
 
-
 # Фикстуры для тестирования
 @pytest.fixture
 def sample_products() -> List[Product]:
@@ -14,12 +13,10 @@ def sample_products() -> List[Product]:
         Product("Наушники", "Беспроводные наушники", 4999.00, 20),
     ]
 
-
 @pytest.fixture
 def empty_product_list() -> List[Product]:
     """Фикстура с пустым списком продуктов"""
     return []
-
 
 @pytest.fixture(autouse=True)
 def reset_counters() -> None:
@@ -27,9 +24,7 @@ def reset_counters() -> None:
     Category.category_count = 0
     Category.product_count = 0
 
-
 # --- ТЕСТЫ ДЛЯ КЛАССА CATEGORY ---
-
 
 def test_category_initialization_with_products(sample_products: List[Product]) -> None:
     """Проверка корректной инициализации категории с продуктами"""
@@ -40,7 +35,6 @@ def test_category_initialization_with_products(sample_products: List[Product]) -
     assert category.products == sample_products
     assert len(category.products) == 3
 
-
 def test_category_initialization_empty_products(empty_product_list: List[Product]) -> None:
     """Проверка инициализации категории с пустым списком продуктов"""
     category = Category(name="Пустая категория", description="Категория без товаров", products=empty_product_list)
@@ -49,7 +43,6 @@ def test_category_initialization_empty_products(empty_product_list: List[Product
     assert category.description == "Категория без товаров"
     assert category.products == []
     assert len(category.products) == 0
-
 
 def test_category_initialization_single_product() -> None:
     """Проверка инициализации категории с одним продуктом"""
@@ -60,9 +53,7 @@ def test_category_initialization_single_product() -> None:
     assert len(category.products) == 1
     assert category.products[0].name == "Книга"
 
-
 # --- ТЕСТЫ ДЛЯ ПОДСЧЁТА КОЛИЧЕСТВА КАТЕГОРИЙ ---
-
 
 def test_category_count_increases_with_each_instance(sample_products: List[Product]) -> None:
     Category("Электроника", "Устройства", sample_products)
@@ -74,7 +65,6 @@ def test_category_count_increases_with_each_instance(sample_products: List[Produ
     Category("Одежда", "Одежда и аксессуары", [])
     assert Category.category_count == 3
 
-
 def test_multiple_categories_creation() -> None:
     products1: List[Product] = [Product("Товар1", "Описание1", 100.0, 5)]
     products2: List[Product] = [Product("Товар2", "Описание2", 200.0, 3)]
@@ -83,22 +73,18 @@ def test_multiple_categories_creation() -> None:
     Category("Категория2", "Описание2", products2)
     assert Category.category_count == 2
 
-
 # --- ТЕСТЫ ДЛЯ ПОДСЧЁТА КОЛИЧЕСТВА ПРОДУКТОВ ---
-
 
 def test_product_count_zero_with_empty_list(empty_product_list: List[Product]) -> None:
     """Проверка нулевого подсчёта продуктов для пустой категории"""
     Category("Пустая", "Без товаров", empty_product_list)
     assert Category.product_count == 0
 
-
 def test_product_count_single_product() -> None:
     """Проверка подсчёта одного продукта"""
     product: Product = Product("Товар", "Описание", 150.0, 7)
     Category("Одиночный", "Один товар", [product])
     assert Category.product_count == 1
-
 
 # --- ТЕСТЫ КРАЙНИХ СЛУЧАЕВ ---
 def test_category_attribute_types(sample_products: List[Product]) -> None:
@@ -110,3 +96,77 @@ def test_category_attribute_types(sample_products: List[Product]) -> None:
     assert isinstance(category.products, list)
     for product in category.products:
         assert isinstance(product, Product)
+
+# --- НОВЫЕ ТЕСТЫ ДЛЯ МЕТОДА add_product ---
+
+def test_add_product_to_category(sample_products: List[Product]) -> None:
+    """Проверка добавления продукта в категорию"""
+    category = Category("Электроника", "Устройства", sample_products[:2])  # Берём 2 продукта из 3
+    new_product = Product("Планшет", "10-дюймовый планшет", 29999.00, 8)
+
+    category.add_product(new_product)
+
+    # Проверяем, что продукт добавился
+    assert len(category.products) == 3
+    assert category.products[-1].name == "Планшет"
+    # Проверяем обновление счётчика
+    assert Category.product_count == 3
+
+def test_add_multiple_products_to_category() -> None:
+    """Проверка последовательного добавления нескольких продуктов"""
+    category = Category("Одежда", "Повседневная одежда", [])
+    product1 = Product("Футболка", "Хлопковая футболка", 999.00, 50)
+    product2 = Product("Джинсы", "Джинсы прямого кроя", 2999.00, 20)
+
+    category.add_product(product1)
+    category.add_product(product2)
+
+    assert len(category.products) == 2
+    assert category.products[0].name == "Футболка"
+    assert category.products[1].name == "Джинсы"
+    assert Category.product_count == 2
+
+def test_add_product_invalid_type(sample_products: List[Product]) -> None:
+    """Проверка обработки попытки добавления объекта неверного типа"""
+    category = Category("Электроника", "Устройства", sample_products)
+
+    with pytest.raises(TypeError, match="Можно добавлять только объекты класса Product"):
+        category.add_product("Не продукт")  # Строка вместо Product
+
+    # Убеждаемся, что список продуктов не изменился
+    assert len(category.products) == 3
+    # Счётчик тоже не изменился
+    assert Category.product_count == 3
+
+# --- НОВЫЕ ТЕСТЫ ДЛЯ МЕТОДА get_products_info ---
+
+def test_get_products_info_format(sample_products: List[Product]) -> None:
+    """Проверка формата вывода информации о продуктах"""
+    category = Category("Электроника", "Устройства", sample_products)
+    products_info = category.get_products_info()
+
+    expected_format = [
+        "Смартфон, 49999.5 руб. Остаток: 10 шт.",
+        "Ноутбук, 79999.99 руб. Остаток: 5 шт.",
+        "Наушники, 4999.0 руб. Остаток: 20 шт."
+    ]
+
+    assert products_info == expected_format
+
+def test_get_products_info_empty_category() -> None:
+    """Проверка вывода информации для пустой категории"""
+    category = Category("Пустая", "Без товаров", [])
+    products_info = category.get_products_info()
+
+    assert products_info == []
+
+def test_get_products_info_single_product() -> None:
+    """Проверка вывода информации для категории с одним продуктом"""
+    product = Product("Книга", "Художественная литература", 599.0, 25)
+    category = Category("Книги", "Литературные произведения", [product])
+    products_info = category.get_products_info()
+
+    expected = ["Книга, 599.0 руб. Остаток: 25 шт."]
+    assert products_info == expected
+
+

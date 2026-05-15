@@ -2,6 +2,7 @@ from src.product import Product
 import pytest
 from typing import List, Generator, Any
 
+
 # Фикстура на уровне функции — создаёт один продукт для теста
 @pytest.fixture
 def sample_product() -> Product:
@@ -50,7 +51,8 @@ def temporary_product() -> Generator[Product, None, None]:
     # Код после yield выполняется после завершения теста
     print(f"Продукт '{product.name}' удалён после теста")
 
-# --- ТЕСТЫ С ИСПОЛЬЗОВАНИЕМ ФИКСТУР ---
+# --- СУЩЕСТВУЮЩИЕ ТЕСТЫ (сохраняются без изменений) ---
+
 def test_product_creation_with_fixture(sample_product: Product) -> None:
     """Тест с использованием простой фикстуры"""
     assert sample_product.name == "Смартфон"
@@ -94,11 +96,11 @@ def test_temporary_product_operations(temporary_product: Product) -> None:
     assert temporary_product.name == "Временный товар"
     assert temporary_product.price == 999.0
 
+
     # Изменяем количество для проверки
     temporary_product.quantity = 5
     assert temporary_product.quantity == 5
 
-# Комбинированный тест — использует несколько фикстур одновременно
 def test_combined_fixtures(sample_product: Product, product_list: List[Product]) -> None:
     """Тест, использующий несколько фикстур"""
     # Сравниваем цену образца с ценами из списка
@@ -107,15 +109,64 @@ def test_combined_fixtures(sample_product: Product, product_list: List[Product])
 
     assert sample_price > max(list_prices)  # Смартфон дороже всех товаров в списке
 
-# Тест с зависимостью от фикстуры (использует фикстуру внутри теста)
 def test_dynamic_product_creation() -> None:
     """Тест с динамическим созданием фикстуры внутри теста"""
     def create_test_product(name: str, price: float) -> Product:
         return Product(name, "Автоматически созданный продукт", price, 1)
 
+
     cheap_product: Product = create_test_product("Дешёвый товар", 10.0)
     expensive_product: Product = create_test_product("Дорогой товар", 10000.0)
 
-
     assert cheap_product.price == 10.0
     assert expensive_product.price == 10000.0
+
+
+# --- НОВЫЕ ТЕСТЫ ДЛЯ НОВОЙ ФУНКЦИОНАЛЬНОСТИ ---
+
+
+def test_total_cost_property(sample_product: Product) -> None:
+    """Проверка свойства total_cost"""
+    expected_total = sample_product.price * sample_product.quantity
+    assert sample_product.total_cost == expected_total
+
+
+def test_apply_discount_positive(sample_product: Product) -> None:
+    """Проверка применения скидки (20 %)"""
+    original_price = sample_product.price
+    sample_product.apply_discount(20)  # Скидка 20 %
+    expected_price = original_price * 0.8
+    assert sample_product.price == expected_price
+
+def test_apply_discount_zero(sample_product: Product) -> None:
+    """Проверка применения нулевой скидки"""
+    original_price = sample_product.price
+    sample_product.apply_discount(0)
+    assert sample_product.price == original_price
+
+def test_apply_discount_full(sample_product: Product) -> None:
+    """Проверка применения 100 % скидки (цена должна стать 0)"""
+    sample_product.apply_discount(100)
+    assert sample_product.price == 0.0
+
+def test_apply_discount_invalid_percentage() -> None:
+    """Проверка обработки недопустимого процента скидки"""
+    product = Product("Товар", "Описание", 1000.0, 5)
+
+    with pytest.raises(ValueError, match="Скидка должна быть в диапазоне 0–100%"):
+        product.apply_discount(-10)
+
+    with pytest.raises(ValueError, match="Скидка должна быть в диапазоне 0–100%"):
+        product.apply_discount(150)
+
+
+def test_negative_quantity_validation() -> None:
+    """Проверка валидации отрицательного количества"""
+    with pytest.raises(ValueError, match="Количество не может быть отрицательным"):
+        Product("Товар", "Описание", 100.0, -5)
+
+
+def test_zero_quantity_allowed() -> None:
+    """Проверка, что нулевое количество разрешено"""
+    product = Product("Нет в наличии", "Описание", 100.0, 0)
+    assert product.quantity == 0
