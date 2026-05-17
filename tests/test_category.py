@@ -149,7 +149,7 @@ def test_add_product_invalid_type(sample_products: List[Product]) -> None:
     category = Category("Электроника", "Устройства", sample_products)
 
     with pytest.raises(TypeError, match="Можно добавлять только объекты класса Product"):
-        category.add_product("Не продукт")  # Строка вместо Product
+        category.add_product("Не продукт")   # type: ignore
 
     # Убеждаемся, что список продуктов не изменился
     assert len(category.products) == 3
