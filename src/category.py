@@ -1,6 +1,7 @@
 from src.product import Product
 from typing import List, Optional
 
+
 class Category:
     """Класс для представления категорий"""
 

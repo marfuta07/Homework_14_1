@@ -19,18 +19,18 @@ class Product:
         self.quantity = quantity
 
     @classmethod
-    def new_product(cls, product_data: dict) -> 'Product':
+    def new_product(cls, product_data: dict) -> "Product":
         """Создаёт новый объект Product из словаря с данными."""
-        required_keys = ['name', 'description', 'price', 'quantity']
+        required_keys = ["name", "description", "price", "quantity"]
         missing_keys = [key for key in required_keys if key not in product_data]
         if missing_keys:
             raise KeyError(f"Отсутствуют обязательные ключи в словаре: {missing_keys}")
 
         return cls(
-            name=product_data['name'],
-            description=product_data['description'],
-            price=product_data['price'],
-            quantity=product_data['quantity']
+            name=product_data["name"],
+            description=product_data["description"],
+            price=product_data["price"],
+            quantity=product_data["quantity"],
         )
 
     @property
