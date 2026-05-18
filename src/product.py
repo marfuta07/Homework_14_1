@@ -25,7 +25,6 @@ class Product:
         missing_keys = [key for key in required_keys if key not in product_data]
         if missing_keys:
             raise KeyError(f"Отсутствуют обязательные ключи в словаре: {missing_keys}")
-
         return cls(
             name=product_data["name"],
             description=product_data["description"],
@@ -41,8 +40,8 @@ class Product:
     @price.setter
     def price(self, value: float) -> None:
         """Сеттер для установки цены с валидацией."""
-        if value < 0:
-            print("Предупреждение: цена не может быть отрицательной. Значение не изменено.")
+        if value <= 0:
+            print("Цена не должна быть нулевая или отрицательная")
             return
         self._price = value
 
