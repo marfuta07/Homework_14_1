@@ -110,3 +110,83 @@ def test_category_attribute_types(sample_products: List[Product]) -> None:
     assert isinstance(category.products, list)
     for product in category.products:
         assert isinstance(product, Product)
+
+
+# --- НОВЫЕ ТЕСТЫ ДЛЯ МЕТОДА add_product ---
+
+
+def test_add_product_to_category(sample_products: List[Product]) -> None:
+    """Проверка добавления продукта в категорию"""
+    category = Category("Электроника", "Устройства", sample_products[:2])  # Берём 2 продукта из 3
+    new_product = Product("Планшет", "10-дюймовый планшет", 29999.00, 8)
+
+    category.add_product(new_product)
+
+    # Проверяем, что продукт добавился
+    assert len(category.products) == 3
+    assert category.products[-1].name == "Планшет"
+    # Проверяем обновление счётчика
+    assert Category.product_count == 3
+
+
+def test_add_multiple_products_to_category() -> None:
+    """Проверка последовательного добавления нескольких продуктов"""
+    category = Category("Одежда", "Повседневная одежда", [])
+    product1 = Product("Футболка", "Хлопковая футболка", 999.00, 50)
+    product2 = Product("Джинсы", "Джинсы прямого кроя", 2999.00, 20)
+
+    category.add_product(product1)
+    category.add_product(product2)
+
+    assert len(category.products) == 2
+    assert category.products[0].name == "Футболка"
+    assert category.products[1].name == "Джинсы"
+    assert Category.product_count == 2
+
+
+def test_add_product_invalid_type(sample_products: List[Product]) -> None:
+    """Проверка обработки попытки добавления объекта неверного типа"""
+    category = Category("Электроника", "Устройства", sample_products)
+
+    with pytest.raises(TypeError, match="Можно добавлять только объекты класса Product"):
+        category.add_product("Не продукт")   # type: ignore
+
+    # Убеждаемся, что список продуктов не изменился
+    assert len(category.products) == 3
+    # Счётчик тоже не изменился
+    assert Category.product_count == 3
+
+
+# --- НОВЫЕ ТЕСТЫ ДЛЯ МЕТОДА get_products_info ---
+
+
+def test_get_products_info_format(sample_products: List[Product]) -> None:
+    """Проверка формата вывода информации о продуктах"""
+    category = Category("Электроника", "Устройства", sample_products)
+    products_info = category.get_products_info()
+
+    expected_format = [
+        "Смартфон, 49999.5 руб. Остаток: 10 шт.",
+        "Ноутбук, 79999.99 руб. Остаток: 5 шт.",
+        "Наушники, 4999.0 руб. Остаток: 20 шт.",
+    ]
+
+    assert products_info == expected_format
+
+
+def test_get_products_info_empty_category() -> None:
+    """Проверка вывода информации для пустой категории"""
+    category = Category("Пустая", "Без товаров", [])
+    products_info = category.get_products_info()
+
+    assert products_info == []
+
+
+def test_get_products_info_single_product() -> None:
+    """Проверка вывода информации для категории с одним продуктом"""
+    product = Product("Книга", "Художественная литература", 599.0, 25)
+    category = Category("Книги", "Литературные произведения", [product])
+    products_info = category.get_products_info()
+
+    expected = ["Книга, 599.0 руб. Остаток: 25 шт."]
+    assert products_info == expected
