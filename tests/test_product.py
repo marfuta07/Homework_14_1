@@ -53,7 +53,7 @@ def temporary_product() -> Generator[Product, None, None]:
     print(f"Продукт '{product.name}' удалён после теста")
 
 
-# --- СУЩЕСТВУЮЩИЕ ТЕСТЫ (сохраняются без изменений) ---
+# --- ТЕСТЫ  ---
 
 
 def test_product_creation_with_fixture(sample_product: Product) -> None:
@@ -130,7 +130,7 @@ def test_dynamic_product_creation() -> None:
     assert expensive_product.price == 10000.0
 
 
-# --- НОВЫЕ ТЕСТЫ ДЛЯ НОВОЙ ФУНКЦИОНАЛЬНОСТИ ---
+# ---  ТЕСТЫ ДЛЯ НОВОЙ ФУНКЦИОНАЛЬНОСТИ ---
 
 
 def test_total_cost_property(sample_product: Product) -> None:
@@ -181,3 +181,64 @@ def test_zero_quantity_allowed() -> None:
     """Проверка, что нулевое количество разрешено"""
     product = Product("Нет в наличии", "Описание", 100.0, 0)
     assert product.quantity == 0
+
+
+#---Тесты для новых функций---
+
+
+def test_product_str_representation(sample_product: Product) -> None:
+    """Проверка строкового представления продукта"""
+    result = str(sample_product)
+    assert result == "Смартфон, 49999.5 руб. Остаток: 10 шт."
+
+
+def test_product_str_with_zero_quantity() -> None:
+    """Проверка строкового представления продукта с нулевым количеством"""
+    product = Product("Товар", "Описание", 1500.0, 0)
+    result = str(product)
+    assert result == "Товар, 1500.0 руб. Остаток: 0 шт."
+
+
+def test_product_str_with_fractional_price() -> None:
+    """Проверка строкового представления продукта с дробной ценой"""
+    product = Product("Кофе", "Арабика", 1299.95, 15)
+    result = str(product)
+    assert result == "Кофе, 1299.95 руб. Остаток: 15 шт."
+
+
+def test_product_addition_returns_total_cost(sample_product: Product, product_list: List[Product]) -> None:
+    """Проверка, что сложение двух продуктов возвращает общую стоимость их запасов"""
+    # Берём первый продукт из списка (Книга, цена 599.0, количество 25)
+    other_product = product_list[0]
+    total_cost = sample_product.total_cost + other_product.total_cost
+    result = sample_product + other_product
+    assert result == total_cost
+    # Конкретные числа: 49999.5 * 10 + 599.0 * 25 = 499995 + 14975 = 514970.0
+    assert result == 514970.0
+
+
+def test_product_addition_commutative(sample_product: Product, product_list: List[Product]) -> None:
+    """Проверка коммутативности сложения продуктов (a + b == b + a)"""
+    other_product = product_list[0]
+    assert sample_product + other_product == other_product + sample_product
+
+
+def test_product_addition_with_same_product(sample_product: Product) -> None:
+    """Проверка сложения продукта с самим собой"""
+    total_cost = sample_product.total_cost * 2
+    result = sample_product + sample_product
+    assert result == total_cost
+
+
+def test_product_addition_invalid_type(sample_product: Product) -> None:
+    """Проверка обработки сложения с объектом неверного типа"""
+    with pytest.raises(TypeError):
+        _ = sample_product + "не продукт"  # type: ignore
+
+    # Также проверим, что NotImplemented обрабатывается корректно Python'ом
+    class FakeProduct:
+        pass
+
+    fake = FakeProduct()
+    with pytest.raises(TypeError):
+        _ = sample_product + fake  # type: ignore
