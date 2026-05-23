@@ -112,7 +112,7 @@ def test_category_attribute_types(sample_products: List[Product]) -> None:
         assert isinstance(product, Product)
 
 
-# --- НОВЫЕ ТЕСТЫ ДЛЯ МЕТОДА add_product ---
+# --- ТЕСТЫ ДЛЯ МЕТОДА add_product ---
 
 
 def test_add_product_to_category(sample_products: List[Product]) -> None:
@@ -157,7 +157,7 @@ def test_add_product_invalid_type(sample_products: List[Product]) -> None:
     assert Category.product_count == 3
 
 
-# --- НОВЫЕ ТЕСТЫ ДЛЯ МЕТОДА get_products_info ---
+# --- ТЕСТЫ ДЛЯ МЕТОДА get_products_info ---
 
 
 def test_get_products_info_format(sample_products: List[Product]) -> None:
@@ -190,3 +190,52 @@ def test_get_products_info_single_product() -> None:
 
     expected = ["Книга, 599.0 руб. Остаток: 25 шт."]
     assert products_info == expected
+
+
+# --- ТЕСТЫ ДЛЯ СТРОКОВОГО ПРЕДСТАВЛЕНИЯ CATEGORY (__str__) ---
+
+def test_category_str_representation(sample_products: List[Product]) -> None:
+    """Проверка строкового представления категории с несколькими продуктами"""
+    category = Category("Электроника", "Электронные устройства", sample_products)
+    result = str(category)
+    # Общее количество товаров: 10 + 5 + 20 = 35
+    assert result == "Электроника, количество продуктов: 35 шт."
+
+
+def test_category_str_empty_products() -> None:
+    """Проверка строкового представления пустой категории"""
+    category = Category("Пустая", "Без товаров", [])
+    result = str(category)
+    assert result == "Пустая, количество продуктов: 0 шт."
+
+
+def test_category_str_single_product() -> None:
+    """Проверка строкового представления категории с одним продуктом"""
+    product = Product("Книга", "Художественная литература", 599.0, 25)
+    category = Category("Книги", "Литературные произведения", [product])
+    result = str(category)
+    assert result == "Книги, количество продуктов: 25 шт."
+
+
+def test_category_str_after_adding_product(sample_products: List[Product]) -> None:
+    """Проверка, что строковое представление корректно обновляется после добавления товара"""
+    # Берём только два продукта из трёх
+    category = Category("Электроника", "Устройства", sample_products[:2])
+    # Изначально: 10 + 5 = 15 шт.
+    assert str(category) == "Электроника, количество продуктов: 15 шт."
+
+    # Добавляем третий продукт с количеством 20
+    category.add_product(sample_products[2])
+    # Теперь общее количество: 10 + 5 + 20 = 35 шт.
+    assert str(category) == "Электроника, количество продуктов: 35 шт."
+
+
+def test_category_str_with_zero_quantity_products() -> None:
+    """Проверка строкового представления, когда у товаров нулевое количество"""
+    products = [
+        Product("Смартфон", "Мощный смартфон", 49999.50, 0),
+        Product("Ноутбук", "Игровой ноутбук", 79999.99, 0),
+    ]
+    category = Category("Склад", "Товары на складе", products)
+    result = str(category)
+    assert result == "Склад, количество продуктов: 0 шт."
