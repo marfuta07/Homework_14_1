@@ -183,7 +183,7 @@ def test_zero_quantity_allowed() -> None:
     assert product.quantity == 0
 
 
-#---Тесты для новых функций---
+# ---Тесты для новых функций---
 
 
 def test_product_str_representation(sample_product: Product) -> None:
