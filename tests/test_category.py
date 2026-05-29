@@ -254,7 +254,7 @@ def test_add_smartphone_to_category() -> None:
         efficiency="высокая",
         model="14 Pro",
         memory=256,
-        color="серебристый"
+        color="серебристый",
     )
 
     category.add_product(smartphone)
@@ -274,7 +274,7 @@ def test_add_lawn_grass_to_category() -> None:
         quantity=10,
         country="Россия",
         germination_period=14,
-        color="зелёный"
+        color="зелёный",
     )
 
     category.add_product(grass)
@@ -294,7 +294,7 @@ def test_init_with_smartphones_and_grass() -> None:
         efficiency="средняя",
         model="S23",
         memory=128,
-        color="чёрный"
+        color="чёрный",
     )
     grass = LawnGrass(
         name="Спортивная трава",
@@ -303,7 +303,7 @@ def test_init_with_smartphones_and_grass() -> None:
         quantity=7,
         country="Германия",
         germination_period=21,
-        color="тёмно-зелёный"
+        color="тёмно-зелёный",
     )
 
     category = Category("Смешанная", "Электроника и товары для сада", [smartphone, grass])
@@ -318,14 +318,7 @@ def test_add_invalid_types_raises_type_error() -> None:
     """Проверка, что разные некорректные типы вызывают TypeError"""
     category = Category("Тестовая", "Описание")
 
-    invalid_objects = [
-        "просто строка",
-        42,
-        3.14,
-        [],
-        {},
-        None
-    ]
+    invalid_objects = ["просто строка", 42, 3.14, [], {}, None]
 
     for obj in invalid_objects:
         with pytest.raises(TypeError, match="Можно добавлять только объекты класса Product"):
@@ -354,7 +347,7 @@ def test_get_products_info_with_smartphone() -> None:
         efficiency="средняя",
         model="Redmi 12",
         memory=64,
-        color="синий"
+        color="синий",
     )
     category = Category("Смартфоны", "Мобильные устройства", [smartphone])
     products_info = category.get_products_info()
@@ -372,7 +365,7 @@ def test_get_products_info_with_lawn_grass() -> None:
         quantity=8,
         country="Франция",
         germination_period=18,
-        color="изумрудно-зелёный"
+        color="изумрудно-зелёный",
     )
     category = Category("Газоны", "Семена трав", [grass])
     products_info = category.get_products_info()
@@ -391,7 +384,7 @@ def test_category_str_with_smartphones_and_grass() -> None:
         efficiency="высокая",
         model="7",
         memory=128,
-        color="белый"
+        color="белый",
     )
     grass = LawnGrass(
         name="Теневыносливая трава",
@@ -400,7 +393,7 @@ def test_category_str_with_smartphones_and_grass() -> None:
         quantity=12,
         country="Канада",
         germination_period=25,
-        color="светло-зелёный"
+        color="светло-зелёный",
     )
 
     category = Category("Микс", "Разные товары", [smartphone, grass])

@@ -1,4 +1,4 @@
-from src.product import Product, Smartphone,LawnGrass
+from src.product import Product, Smartphone, LawnGrass
 import pytest
 from typing import List, Generator, Any
 
@@ -38,7 +38,7 @@ def expensive_product_setup() -> Generator[List[Product], None, None]:
     """Фикстура для ресурсоёмкой инициализации"""
     print("\nИнициализация сложных тестовых данных...")
     products: List[Product] = []
-    for i in range(1,101):
+    for i in range(1, 101):
         price = i * 100.5  # цена всегда > 0
         quantity = i
         products.append(Product(f"Товар_{i}", f"Описание товара {i}", i * 100.5, i))
@@ -246,7 +246,6 @@ def test_product_addition_invalid_type(sample_product: Product) -> None:
         _ = sample_product + fake  # type: ignore
 
 
-
 def test_product_addition_same_class_allowed(sample_product: Product, product_list: List[Product]) -> None:
     """Проверка, что сложение продуктов одного класса (Product) работает корректно"""
     other_product = product_list[1]  # Кофе
@@ -267,7 +266,7 @@ def test_product_addition_different_classes_raises_type_error() -> None:
         efficiency="высокая",
         model="14 Pro",
         memory=256,
-        color="серебристый"
+        color="серебристый",
     )
     grass = LawnGrass(
         name="Газонная трава",
@@ -276,7 +275,7 @@ def test_product_addition_different_classes_raises_type_error() -> None:
         quantity=10,
         country="Россия",
         germination_period=14,
-        color="зелёный"
+        color="зелёный",
     )
 
     with pytest.raises(TypeError, match="Нельзя складывать товары разных классов"):
@@ -295,7 +294,7 @@ def test_product_addition_same_subclass_works(sample_product: Product) -> None:
         efficiency="средняя",
         model="S23",
         memory=128,
-        color="чёрный"
+        color="чёрный",
     )
     smartphone2 = Smartphone(
         name="Xiaomi",
@@ -305,15 +304,12 @@ def test_product_addition_same_subclass_works(sample_product: Product) -> None:
         efficiency="средняя",
         model="Redmi 12",
         memory=64,
-        color="синий"
+        color="синий",
     )
 
     result = smartphone1 + smartphone2
     expected = smartphone1.total_cost + smartphone2.total_cost
     assert result == expected
-
-
-
 
 
 def test_add_product_valid_types(sample_product: Product) -> None:
@@ -334,7 +330,7 @@ def test_add_product_valid_types(sample_product: Product) -> None:
         efficiency="высокая",
         model="11",
         memory=256,
-        color="чёрный"
+        color="чёрный",
     )
     category.add_product(smartphone)
     # Добавляем наследника LawnGrass
@@ -345,7 +341,7 @@ def test_add_product_valid_types(sample_product: Product) -> None:
         quantity=7,
         country="Германия",
         germination_period=21,
-        color="тёмно-зелёный"
+        color="тёмно-зелёный",
     )
     category.add_product(grass)
 
@@ -369,7 +365,7 @@ def test_category_init_validates_all_products() -> None:
         efficiency="средняя",
         model="10",
         memory=128,
-        color="жёлтый"
+        color="жёлтый",
     )
     product = Product("Книга", "Художественная литература", 599.0, 25)
 
@@ -398,15 +394,7 @@ def test_category_add_product_invalid_types() -> None:
 
     category = Category("Тестовая", "Описание")
 
-    invalid_objects = [
-        "строка",
-        42,
-        3.14,
-        [],
-        {},
-        None,
-        lambda: None
-    ]
+    invalid_objects = ["строка", 42, 3.14, [], {}, None, lambda: None]
 
     for obj in invalid_objects:
         with pytest.raises(TypeError, match="Можно добавлять только объекты класса Product"):

@@ -157,8 +157,10 @@ class Smartphone(Product):
 
     def __str__(self) -> str:
         """Строковое представление смартфона."""
-        return (f"{self.name} {self.model}, {self.color}, "
-                f"{self.memory} ГБ, {self.price} руб. Остаток: {self.quantity} шт.")
+        return (
+            f"{self.name} {self.model}, {self.color}, "
+            f"{self.memory} ГБ, {self.price} руб. Остаток: {self.quantity} шт."
+        )
 
 
 class LawnGrass(Product):
@@ -193,6 +195,8 @@ class LawnGrass(Product):
 
     def __str__(self) -> str:
         """Строковое представление газонной травы."""
-        return (f"{self.name}, {self.color}, произв. {self.country}, "
-                f"прорастание {self.germination_period} дн., "
-                f"{self.price} руб. Остаток: {self.quantity} шт.")
+        return (
+            f"{self.name}, {self.color}, произв. {self.country}, "
+            f"прорастание {self.germination_period} дн., "
+            f"{self.price} руб. Остаток: {self.quantity} шт."
+        )
