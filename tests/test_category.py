@@ -2,6 +2,7 @@ import pytest
 from typing import List
 from src.product import Product
 from src.category import Category
+from src.product import Smartphone, LawnGrass
 
 
 # Фикстуры для тестирования
@@ -240,3 +241,170 @@ def test_category_str_with_zero_quantity_products() -> None:
     category = Category("Склад", "Товары на складе", products)
     result = str(category)
     assert result == "Склад, количество продуктов: 0 шт."
+
+
+def test_add_smartphone_to_category() -> None:
+    """Проверка добавления смартфона (наследника Product) в категорию"""
+    category = Category("Электроника", "Смартфоны и гаджеты")
+    smartphone = Smartphone(
+        name="iPhone",
+        description="Флагманский смартфон",
+        price=89999.0,
+        quantity=5,
+        efficiency="высокая",
+        model="14 Pro",
+        memory=256,
+        color="серебристый"
+    )
+
+    category.add_product(smartphone)
+
+    assert len(category.products) == 1
+    assert category.products[0].name == "iPhone"
+    assert Category.product_count == 1
+
+
+def test_add_lawn_grass_to_category() -> None:
+    """Проверка добавления газонной травы (наследника Product) в категорию"""
+    category = Category("Сад и огород", "Товары для дачи")
+    grass = LawnGrass(
+        name="Газонная трава",
+        description="Универсальная смесь",
+        price=1200.0,
+        quantity=10,
+        country="Россия",
+        germination_period=14,
+        color="зелёный"
+    )
+
+    category.add_product(grass)
+
+    assert len(category.products) == 1
+    assert category.products[0].name == "Газонная трава"
+    assert Category.product_count == 1
+
+
+def test_init_with_smartphones_and_grass() -> None:
+    """Проверка инициализации категории со смешанным списком наследников Product"""
+    smartphone = Smartphone(
+        name="Samsung",
+        description="Android-смартфон",
+        price=45000.0,
+        quantity=8,
+        efficiency="средняя",
+        model="S23",
+        memory=128,
+        color="чёрный"
+    )
+    grass = LawnGrass(
+        name="Спортивная трава",
+        description="Износостойкая",
+        price=1500.0,
+        quantity=7,
+        country="Германия",
+        germination_period=21,
+        color="тёмно-зелёный"
+    )
+
+    category = Category("Смешанная", "Электроника и товары для сада", [smartphone, grass])
+
+    assert len(category.products) == 2
+    assert isinstance(category.products[0], Smartphone)
+    assert isinstance(category.products[1], LawnGrass)
+    assert Category.product_count == 2
+
+
+def test_add_invalid_types_raises_type_error() -> None:
+    """Проверка, что разные некорректные типы вызывают TypeError"""
+    category = Category("Тестовая", "Описание")
+
+    invalid_objects = [
+        "просто строка",
+        42,
+        3.14,
+        [],
+        {},
+        None
+    ]
+
+    for obj in invalid_objects:
+        with pytest.raises(TypeError, match="Можно добавлять только объекты класса Product"):
+            category.add_product(obj)  # type: ignore
+
+    # Убеждаемся, что ни один объект не добавился
+    assert len(category.products) == 0
+    assert Category.product_count == 0
+
+
+def test_init_with_invalid_object_in_products_list() -> None:
+    """Проверка, что инициализация с некорректным объектом в списке вызывает TypeError"""
+    valid_product = Product("Товар", "Описание", 100.0, 5)
+
+    with pytest.raises(TypeError, match="Можно добавлять только объекты класса Product"):
+        Category("Ошибка", "Описание", [valid_product, "не продукт"])  # type: ignore
+
+
+def test_get_products_info_with_smartphone() -> None:
+    """Проверка вывода информации для смартфона через get_products_info"""
+    smartphone = Smartphone(
+        name="Xiaomi",
+        description="Бюджетный смартфон",
+        price=19999.0,
+        quantity=15,
+        efficiency="средняя",
+        model="Redmi 12",
+        memory=64,
+        color="синий"
+    )
+    category = Category("Смартфоны", "Мобильные устройства", [smartphone])
+    products_info = category.get_products_info()
+
+    expected = ["Xiaomi Redmi 12, синий, 64 ГБ, 19999.0 руб. Остаток: 15 шт."]
+    assert products_info == expected
+
+
+def test_get_products_info_with_lawn_grass() -> None:
+    """Проверка вывода информации для газонной травы через get_products_info"""
+    grass = LawnGrass(
+        name="Партерная трава",
+        description="Для декоративных газонов",
+        price=1800.0,
+        quantity=8,
+        country="Франция",
+        germination_period=18,
+        color="изумрудно-зелёный"
+    )
+    category = Category("Газоны", "Семена трав", [grass])
+    products_info = category.get_products_info()
+
+    expected = ["Партерная трава, изумрудно-зелёный, произв. Франция, прорастание 18 дн., 1800.0 руб. Остаток: 8 шт."]
+    assert products_info == expected
+
+
+def test_category_str_with_smartphones_and_grass() -> None:
+    """Проверка строкового представления категории со смешанными наследниками"""
+    smartphone = Smartphone(
+        name="Google Pixel",
+        description="Чистый Android",
+        price=65000.0,
+        quantity=3,
+        efficiency="высокая",
+        model="7",
+        memory=128,
+        color="белый"
+    )
+    grass = LawnGrass(
+        name="Теневыносливая трава",
+        description="Для затенённых участков",
+        price=2000.0,
+        quantity=12,
+        country="Канада",
+        germination_period=25,
+        color="светло-зелёный"
+    )
+
+    category = Category("Микс", "Разные товары", [smartphone, grass])
+    result = str(category)
+
+    # Общее количество: 3 + 12 = 15 шт.
+    assert result == "Микс, количество продуктов: 15 шт."
