@@ -117,7 +117,7 @@ class Product:
         """
         if not isinstance(other, Product):
             return NotImplemented
-        if type(self) != type(other):
+        if type(self) is not type(other):
             raise TypeError("Нельзя складывать товары разных классов")
         return self.total_cost + other.total_cost
 

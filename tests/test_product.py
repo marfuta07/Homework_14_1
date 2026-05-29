@@ -1,4 +1,5 @@
-from src.product import Product, Smartphone, LawnGrass
+from src.category import Category
+from src.product import Smartphone, LawnGrass, Product
 import pytest
 from typing import List, Generator, Any
 
@@ -39,9 +40,12 @@ def expensive_product_setup() -> Generator[List[Product], None, None]:
     print("\nИнициализация сложных тестовых данных...")
     products: List[Product] = []
     for i in range(1, 101):
-        price = i * 100.5  # цена всегда > 0
-        quantity = i
-        products.append(Product(f"Товар_{i}", f"Описание товара {i}", i * 100.5, i))
+        products.append(Product(
+            name=f"Товар_{i}",
+            description=f"Описание товара {i}",
+            price=i * 100.5,
+            quantity=i
+        ))
     yield products
     print("Очистка сложных тестовых данных...")
 
@@ -256,8 +260,6 @@ def test_product_addition_same_class_allowed(sample_product: Product, product_li
 
 def test_product_addition_different_classes_raises_type_error() -> None:
     """Проверка, что сложение продуктов разных классов (например, Smartphone и LawnGrass) вызывает TypeError"""
-    from src.product import Smartphone, LawnGrass
-
     smartphone = Smartphone(
         name="iPhone",
         description="Флагманский смартфон",
@@ -284,8 +286,6 @@ def test_product_addition_different_classes_raises_type_error() -> None:
 
 def test_product_addition_same_subclass_works(sample_product: Product) -> None:
     """Проверка, что сложение двух объектов одного подкласса работает (например, два смартфона)"""
-    from src.product import Smartphone
-
     smartphone1 = Smartphone(
         name="Samsung",
         description="Android-смартфон",
@@ -314,9 +314,6 @@ def test_product_addition_same_subclass_works(sample_product: Product) -> None:
 
 def test_add_product_valid_types(sample_product: Product) -> None:
     """Проверка, что add_product принимает Product и его наследников"""
-    from src.category import Category
-    from src.product import Smartphone, LawnGrass
-
     category = Category("Смешанная", "Разные товары")
 
     # Добавляем базовый Product
@@ -351,9 +348,6 @@ def test_add_product_valid_types(sample_product: Product) -> None:
 
 def test_category_init_validates_all_products() -> None:
     """Проверка, что инициализация Category проверяет каждый продукт в списке"""
-    from src.category import Category
-    from src.product import Smartphone
-
     Category.category_count = 0
     Category.product_count = 0
 
