@@ -40,17 +40,10 @@ class Category:
         """
         Геттер для получения информации о товарах в виде форматированных строк.
 
-        Формат каждой строки:
-        "Название продукта, 80 руб. Остаток: 15 шт."
-
         Returns:
             Список строк с информацией о товарах категории
         """
-        products_info = []
-        for product in self.__products:
-            info = f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт."
-            products_info.append(info)
-        return products_info
+        return [str(product) for product in self.__products]
 
     def get_product_count(self) -> int:
         """
@@ -60,3 +53,8 @@ class Category:
             Количество товаров в категории
         """
         return len(self.__products)
+
+    def __str__(self) -> str:
+        """Строковое представление категории."""
+        total_quantity = sum(product.quantity for product in self.__products)
+        return f"{self.name}, количество продуктов: {total_quantity} шт."

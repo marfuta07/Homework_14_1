@@ -77,3 +77,20 @@ class Product:
 
         discount_factor = 1 - (discount_percent / 100)
         self._price *= discount_factor
+
+    def __str__(self) -> str:
+        """Строковое представление продукта."""
+        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
+
+    def __add__(self, other: "Product") -> float:
+        """
+        Сложение двух продуктов возвращает общую стоимость всех единиц этих товаров на складе.
+
+        Пример:
+            product1: цена 100 руб., количество 10 → стоимость: 1000 руб.
+            product2: цена 200 руб., количество 2 → стоимость: 400 руб.
+            Результат product1 + product2 = 1400.0
+        """
+        if not isinstance(other, Product):
+            return NotImplemented
+        return self.total_cost + other.total_cost
