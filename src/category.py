@@ -9,12 +9,19 @@ class Category:
     product_count: int = 0
 
     def __init__(self, name: str, description: str, products: Optional[List[Product]] = None) -> None:
-        """Метод для инициализации экземпляра класса."""
+        """Метод для инициализации экземпляра класса.
+
+        При создании категории увеличивает счётчики категорий и товаров.
+        """
         self.name = name
         self.description = description
-        self.__products: List[Product] = products if products is not None else []
+        self.__products: List[Product] = []
         Category.category_count += 1
-        Category.product_count += len(self.__products)
+
+        # Добавляем продукты через add_product, чтобы соблюсти валидацию и корректный подсчёт
+        if products is not None:
+            for product in products:
+                self.add_product(product)
 
     @property
     def products(self) -> List[Product]:
@@ -29,10 +36,16 @@ class Category:
         Метод для добавления товара в категорию.
 
         Args:
-            product: объект класса Product, который нужно добавить в категорию
+            product: объект класса Product или его наследника, который нужно добавить в категорию
+
+        Raises:
+            TypeError: если переданный объект не является экземпляром Product или его наследником
         """
         if not isinstance(product, Product):
-            raise TypeError("Можно добавлять только объекты класса Product")
+            raise TypeError(
+                f"Можно добавлять только объекты класса Product и его наследников, "
+                f"получен {type(product).__name__}"
+            )
         self.__products.append(product)
         Category.product_count += 1
 
