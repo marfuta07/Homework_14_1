@@ -24,7 +24,7 @@ class Category:
                 self.add_product(product)
 
     @property
-    def products(self) -> List[Product]:
+    def products_list(self) -> List[Product]:
         """
         Геттер для доступа к списку товаров.
         Возвращает копию списка, чтобы предотвратить прямое изменение приватного атрибута.
@@ -50,7 +50,7 @@ class Category:
         Category.product_count += 1
 
     @property
-    def products(self) -> List[str]:
+    def products(self) -> str:
         """
         Геттер для получения информации о товарах в виде форматированных строк.
 
