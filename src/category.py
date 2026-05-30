@@ -49,14 +49,19 @@ class Category:
         self.__products.append(product)
         Category.product_count += 1
 
-    def get_products_info(self) -> List[str]:
+    @property
+    def products(self) -> List[str]:
         """
         Геттер для получения информации о товарах в виде форматированных строк.
 
         Returns:
             Список строк с информацией о товарах категории
         """
-        return [str(product) for product in self.__products]
+        product_str=" "
+        for product in self.__products:
+            product_str+=f"{str(product)}\n"
+
+        return product_str
 
     def get_product_count(self) -> int:
         """
