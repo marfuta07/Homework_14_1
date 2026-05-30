@@ -57,9 +57,9 @@ class Category:
         Returns:
             Список строк с информацией о товарах категории
         """
-        product_str=" "
+        product_str = " "
         for product in self.__products:
-            product_str+=f"{str(product)}\n"
+            product_str += f"{str(product)}\n"
 
         return product_str
 

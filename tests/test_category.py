@@ -170,7 +170,6 @@ def test_add_product_invalid_type(sample_products: List[Product]) -> None:
     assert Category.product_count == 3
 
 
-
 # --- ТЕСТЫ ДЛЯ МЕТОДА get_products_info ---
 
 
@@ -209,7 +208,6 @@ def test_products_string_single_product() -> None:
     assert "Книга" in products_str
     assert "599.0" in products_str
     assert "25" in products_str
-
 
 
 # --- ТЕСТЫ ДЛЯ СТРОКОВОГО ПРЕДСТАВЛЕНИЯ CATEGORY (__str__) ---
@@ -262,7 +260,7 @@ def test_category_str_with_zero_quantity_products() -> None:
     assert result == "Склад, количество продуктов: 0 шт."
 
 
-#--Тесты наследования--
+# --Тесты наследования--
 
 
 def test_add_smartphone_to_category() -> None:

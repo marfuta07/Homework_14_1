@@ -40,12 +40,7 @@ def expensive_product_setup() -> Generator[List[Product], None, None]:
     print("\nИнициализация сложных тестовых данных...")
     products: List[Product] = []
     for i in range(1, 101):
-        products.append(Product(
-            name=f"Товар_{i}",
-            description=f"Описание товара {i}",
-            price=i * 100.5,
-            quantity=i
-        ))
+        products.append(Product(name=f"Товар_{i}", description=f"Описание товара {i}", price=i * 100.5, quantity=i))
     yield products
     print("Очистка сложных тестовых данных...")
 
