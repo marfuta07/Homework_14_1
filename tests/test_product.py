@@ -342,7 +342,7 @@ def test_add_product_valid_types(sample_product: Product) -> None:
     )
     category.add_product(grass)
 
-    assert len(category.products) == 3
+    assert category.get_product_count() == 3
     assert Category.product_count == 3
 
 
@@ -365,7 +365,7 @@ def test_category_init_validates_all_products() -> None:
 
     # Список из корректных объектов — должно работать
     category = Category("Электроника", "Смартфоны и книги", [smartphone, product])
-    assert len(category.products) == 2
+    assert category.get_product_count() == 2
     assert Category.product_count == 2
 
 
@@ -394,5 +394,5 @@ def test_category_add_product_invalid_types() -> None:
         with pytest.raises(TypeError, match="Можно добавлять только объекты класса Product"):
             category.add_product(obj)  # type: ignore
 
-    assert len(category.products) == 0
+    assert category.get_product_count() == 0
     assert Category.product_count == 0
