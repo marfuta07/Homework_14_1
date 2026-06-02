@@ -1,4 +1,5 @@
-from src.product import Product
+from src.category import Category
+from src.product import Smartphone, LawnGrass, Product
 import pytest
 from typing import List, Generator, Any
 
@@ -38,8 +39,8 @@ def expensive_product_setup() -> Generator[List[Product], None, None]:
     """Фикстура для ресурсоёмкой инициализации"""
     print("\nИнициализация сложных тестовых данных...")
     products: List[Product] = []
-    for i in range(100):
-        products.append(Product(f"Товар_{i}", f"Описание товара {i}", i * 100.5, i))
+    for i in range(1, 101):
+        products.append(Product(name=f"Товар_{i}", description=f"Описание товара {i}", price=i * 100.5, quantity=i))
     yield products
     print("Очистка сложных тестовых данных...")
 
@@ -94,8 +95,8 @@ def test_expensive_setup(expensive_product_setup: List[Product]) -> None:
     """Тест с использованием ресурсоёмкой фикстуры"""
     assert len(expensive_product_setup) == 100
     # Проверяем первый и последний элементы
-    assert expensive_product_setup[0].name == "Товар_0"
-    assert expensive_product_setup[-1].name == "Товар_99"
+    assert expensive_product_setup[0].name == "Товар_1"
+    assert expensive_product_setup[-1].name == "Товар_100"
 
 
 def test_temporary_product_operations(temporary_product: Product) -> None:
@@ -242,3 +243,151 @@ def test_product_addition_invalid_type(sample_product: Product) -> None:
     fake = FakeProduct()
     with pytest.raises(TypeError):
         _ = sample_product + fake  # type: ignore
+
+
+def test_product_addition_same_class_allowed(sample_product: Product, product_list: List[Product]) -> None:
+    """Проверка, что сложение продуктов одного класса (Product) работает корректно"""
+    other_product = product_list[1]  # Кофе
+    result = sample_product + other_product
+    expected = sample_product.total_cost + other_product.total_cost
+    assert result == expected
+
+
+def test_product_addition_different_classes_raises_type_error() -> None:
+    """Проверка, что сложение продуктов разных классов (например, Smartphone и LawnGrass) вызывает TypeError"""
+    smartphone = Smartphone(
+        name="iPhone",
+        description="Флагманский смартфон",
+        price=89999.0,
+        quantity=5,
+        efficiency="высокая",
+        model="14 Pro",
+        memory=256,
+        color="серебристый",
+    )
+    grass = LawnGrass(
+        name="Газонная трава",
+        description="Универсальная смесь",
+        price=1200.0,
+        quantity=10,
+        country="Россия",
+        germination_period=14,
+        color="зелёный",
+    )
+
+    with pytest.raises(TypeError, match="Нельзя складывать товары разных классов"):
+        _ = smartphone + grass
+
+
+def test_product_addition_same_subclass_works(sample_product: Product) -> None:
+    """Проверка, что сложение двух объектов одного подкласса работает (например, два смартфона)"""
+    smartphone1 = Smartphone(
+        name="Samsung",
+        description="Android-смартфон",
+        price=45000.0,
+        quantity=8,
+        efficiency="средняя",
+        model="S23",
+        memory=128,
+        color="чёрный",
+    )
+    smartphone2 = Smartphone(
+        name="Xiaomi",
+        description="Бюджетный смартфон",
+        price=19999.0,
+        quantity=15,
+        efficiency="средняя",
+        model="Redmi 12",
+        memory=64,
+        color="синий",
+    )
+
+    result = smartphone1 + smartphone2
+    expected = smartphone1.total_cost + smartphone2.total_cost
+    assert result == expected
+
+
+def test_add_product_valid_types(sample_product: Product) -> None:
+    """Проверка, что add_product принимает Product и его наследников"""
+    category = Category("Смешанная", "Разные товары")
+
+    # Добавляем базовый Product
+    category.add_product(sample_product)
+    # Добавляем наследника Smartphone
+    smartphone = Smartphone(
+        name="OnePlus",
+        description="Быстрый смартфон",
+        price=55000.0,
+        quantity=7,
+        efficiency="высокая",
+        model="11",
+        memory=256,
+        color="чёрный",
+    )
+    category.add_product(smartphone)
+    # Добавляем наследника LawnGrass
+    grass = LawnGrass(
+        name="Спортивная трава",
+        description="Износостойкая",
+        price=1500.0,
+        quantity=7,
+        country="Германия",
+        germination_period=21,
+        color="тёмно-зелёный",
+    )
+    category.add_product(grass)
+
+    assert category.get_product_count() == 3
+    assert Category.product_count == 3
+
+
+def test_category_init_validates_all_products() -> None:
+    """Проверка, что инициализация Category проверяет каждый продукт в списке"""
+    Category.category_count = 0
+    Category.product_count = 0
+
+    smartphone = Smartphone(
+        name="Realme",
+        description="Недорогой смартфон",
+        price=25000.0,
+        quantity=12,
+        efficiency="средняя",
+        model="10",
+        memory=128,
+        color="жёлтый",
+    )
+    product = Product("Книга", "Художественная литература", 599.0, 25)
+
+    # Список из корректных объектов — должно работать
+    category = Category("Электроника", "Смартфоны и книги", [smartphone, product])
+    assert category.get_product_count() == 2
+    assert Category.product_count == 2
+
+
+def test_category_init_with_invalid_object_fails() -> None:
+    """Проверка, что инициализация Category с некорректным объектом в списке вызывает ошибку"""
+    from src.category import Category
+
+    valid_product = Product("Товар", "Описание", 100.0, 5)
+
+    with pytest.raises(TypeError, match="Можно добавлять только объекты класса Product"):
+        Category("Ошибка", "Описание", [valid_product, "не продукт"])  # type: ignore
+
+
+def test_category_add_product_invalid_types() -> None:
+    """Проверка, что add_product отклоняет некорректные типы"""
+    from src.category import Category
+
+    Category.category_count = 0
+    Category.product_count = 0
+
+    category = Category("Тестовая", "Описание")
+
+    invalid_objects = ["строка", 42, 3.14, [], {}, None, lambda: None]
+
+    for obj in invalid_objects:
+        with pytest.raises(TypeError, match="Можно добавлять только объекты класса Product"):
+            category.add_product(obj)  # type: ignore
+
+    assert category.get_product_count() == 0
+    assert Category.product_count == 0
