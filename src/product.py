@@ -1,7 +1,6 @@
 from src.base_product import BaseProduct
-from typing import Dict
 from src.miksin import LoggingMixin
-
+from typing import Dict
 
 class Product(LoggingMixin, BaseProduct):
     """Класс для представления продуктов"""
@@ -88,59 +87,53 @@ class Product(LoggingMixin, BaseProduct):
             return NotImplemented
         return self.total_cost + other.total_cost
 
-    class Smartphone(LoggingMixin, Product):
-        """Класс для представления смартфонов, наследник Product."""
+class Smartphone(Product):
+    """Класс для представления смартфонов, наследник Product."""
 
-        def __init__(
-            self,
-            name: str,
-            description: str,
-            price: float,
-            quantity: int,
-            efficiency: str,
-            model: str,
-            memory: int,
-            color: str,
-        ) -> None:
-            super().__init__(name, description, price, quantity)
-            if memory <= 0:
-                raise ValueError("Объём памяти должен быть положительным")
-            self.efficiency = efficiency
-            self.model = model
-            self.memory = memory
-            self.color = color
-
-    def __str__(self) -> str:
-        """Строковое представление смартфона."""
-        return (
-            f"{self.name} {self.model}, {self.memory} ГБ, "
-            f"{self.color}, {self._price} руб. Остаток: {self._quantity} шт."
-        )
-
-    class LawnGrass(LoggingMixin, Product):
-        """Класс для представления газонной травы, наследник Product."""
-
-        def __init__(
-            self,
-            name: str,
-            description: str,
-            price: float,
-            quantity: int,
-            country: str,
-            germination_period: int,
-            color: str,
-        ) -> None:
-            super().__init__(name, description, price, quantity)
-            if germination_period <= 0:
-                raise ValueError("Срок прорастания должен быть положительным")
-            self.country = country
-            self.germination_period = germination_period
-            self.color = color
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        price: float,
+        quantity: int,
+        efficiency: str,
+        model: str,
+        memory: int,
+        color: str,
+    ) -> None:
+        super().__init__(name, description, price, quantity)
+        if memory <= 0:
+            raise ValueError("Объём памяти должен быть положительным")
+        self.efficiency = efficiency
+        self.model = model
+        self.memory = memory
+        self.color = color
 
     def __str__(self) -> str:
-        """Строковое представление газонной травы."""
-        return (
-            f"{self.name}, {self.color}, из {self.country}, "
-            f"прорастание {self.germination_period} дн., "
-            f"{self._price} руб. Остаток: {self._quantity} шт."
-        )
+        return (f"{self.name} {self.model}, {self.memory} ГБ, "
+                f"{self.color}, {self._price} руб. Остаток: {self._quantity} шт.")
+
+class LawnGrass(Product):
+    """Класс для представления газонной травы, наследник Product."""
+
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        price: float,
+        quantity: int,
+        country: str,
+        germination_period: int,
+        color: str,
+    ) -> None:
+        super().__init__(name, description, price, quantity)
+        if germination_period <= 0:
+            raise ValueError("Срок прорастания должен быть положительным")
+        self.country = country
+        self.germination_period = germination_period
+        self.color = color
+
+    def __str__(self) -> str:
+        return (f"{self.name}, {self.color}, из {self.country}, "
+                f"прорастание {self.germination_period} дн., "
+                f"{self._price} руб. Остаток: {self._quantity} шт.")

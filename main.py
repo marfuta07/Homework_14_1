@@ -1,4 +1,4 @@
-from src.product import Product, Smartphone,LawnGrass
+from src.product import Product
 from src.category import Category
 
 
