@@ -1,48 +1,46 @@
-class Product:
+from base_product import BaseProduct
+from typing import Dict
+
+class Product(BaseProduct):
     """Класс для представления продуктов"""
 
-    name: str
-    description: str
-    _quantity: int  # Приватный атрибут количества
-    _price: float  # Приватный атрибут цены
-
     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
-        """Инициализирует экземпляр класса Product.
+        """Инициализирует экземпляр класса Product."""
+        self._name = name
+        self._description = description
+        self._price = 0.0
+        self._quantity = 0
 
-        Args:
-            name: название продукта
-            description: описание продукта
-            price: цена продукта (должна быть положительной)
-            quantity: количество продукта на складе (не может быть отрицательным)
-        """
-        self.name = name
-        self.description = description
+        # Используем сеттеры для валидации
         self.price = price
         self.quantity = quantity
 
     @classmethod
-    def new_product(cls, product_data: dict) -> "Product":
-        """Создаёт новый объект Product из словаря с данными.
-
-        Args:
-            product_data: словарь с ключами 'name', 'description', 'price', 'quantity'
-
-        Returns:
-            Новый экземпляр Product
-
-        Raises:
-            KeyError: если в словаре отсутствуют обязательные ключи
-        """
+    def new_product(cls, product_data: Dict[str, any]) -> "Product":
+        """Создаёт новый объект Product из словаря с данными."""
         required_keys = ["name", "description", "price", "quantity"]
         missing_keys = [key for key in required_keys if key not in product_data]
         if missing_keys:
-            raise KeyError(f"Отсутствуют обязательные ключи в словаре: {missing_keys}")
+            raise KeyError(
+                f"Отсутствуют обязательные ключи: {missing_keys}. "
+                f"Ожидаемые ключи: {required_keys}"
+            )
         return cls(
             name=product_data["name"],
             description=product_data["description"],
             price=product_data["price"],
             quantity=product_data["quantity"],
         )
+
+    # Реализуем абстрактные методы
+    def get_name(self) -> str:
+        return self._name
+
+    def get_price(self) -> float:
+        return self._price
+
+    def get_quantity(self) -> int:
+        return self._quantity
 
     @property
     def price(self) -> float:
@@ -51,14 +49,7 @@ class Product:
 
     @price.setter
     def price(self, value: float) -> None:
-        """Устанавливает цену продукта.
-
-        Args:
-            value: новая цена
-
-        Raises:
-            ValueError: если цена не положительная
-        """
+        """Устанавливает цену продукта."""
         if value <= 0:
             raise ValueError("Цена должна быть положительной")
         self._price = value
@@ -70,14 +61,7 @@ class Product:
 
     @quantity.setter
     def quantity(self, value: int) -> None:
-        """Устанавливает количество продукта.
-
-        Args:
-            value: новое количество
-
-        Raises:
-            ValueError: если количество отрицательное
-        """
+        """Устанавливает количество продукта."""
         if value < 0:
             raise ValueError("Количество не может быть отрицательным")
         self._quantity = value
@@ -88,38 +72,23 @@ class Product:
         return self._price * self._quantity
 
     def apply_discount(self, discount_percent: float) -> None:
-        """Применяет скидку к цене продукта.
-
-        Args:
-            discount_percent: процент скидки (должен быть в диапазоне от 0 до 100)
-
-        Raises:
-            ValueError: если процент скидки вне допустимого диапазона
-        """
+        """Применяет скидку к цене продукта."""
         if not (0 <= discount_percent <= 100):
             raise ValueError("Скидка должна быть в диапазоне 0–100%")
 
         discount_factor = 1 - (discount_percent / 100)
-        self._price *= discount_factor
+        self._price = round(self._price * discount_factor, 2)
 
     def __str__(self) -> str:
         """Возвращает строковое представление продукта."""
-        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
+        return f"{self._name}, {self._price} руб. Остаток: {self._quantity} шт."
 
-    def __add__(self, other: "Product") -> float:
-        """Складывает общую стоимость двух продуктов одного класса.
-        Args:
-            other: другой объект Product
-        Returns:
-            Сумма общей стоимости текущего и другого продукта
-        Raises:
-            TypeError: если другой объект не относится к тому же классу, что и текущий
-        """
-        if not isinstance(other, Product):
+    def __add__(self, other: 'BaseProduct') -> float:
+        """Складывает общую стоимость двух продуктов."""
+        if not isinstance(other, BaseProduct):
             return NotImplemented
-        if type(self) is not type(other):
-            raise TypeError("Нельзя складывать товары разных классов")
         return self.total_cost + other.total_cost
+
 
 
 class Smartphone(Product):
@@ -136,20 +105,9 @@ class Smartphone(Product):
         memory: int,
         color: str,
     ) -> None:
-        """
-        Инициализирует экземпляр класса Smartphone.
-
-        Args:
-            name: название продукта
-            description: описание продукта
-            price: цена продукта
-            quantity: количество на складе
-            efficiency: производительность (например, "высокая", "средняя")
-            model: модель смартфона
-            memory: объем встроенной памяти в ГБ
-            color: цвет смартфона
-        """
         super().__init__(name, description, price, quantity)
+        if memory <= 0:
+            raise ValueError("Объём памяти должен быть положительным")
         self.efficiency = efficiency
         self.model = model
         self.memory = memory
@@ -157,7 +115,9 @@ class Smartphone(Product):
 
     def __str__(self) -> str:
         """Строковое представление смартфона."""
-        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
+        return (f"{self._name} {self.model}, {self.memory} ГБ, "
+                f"{self.color}, {self._price} руб. Остаток: {self._quantity} шт.")
+
 
 
 class LawnGrass(Product):
@@ -173,23 +133,15 @@ class LawnGrass(Product):
         germination_period: int,
         color: str,
     ) -> None:
-        """
-        Инициализирует экземпляр класса LawnGrass.
-
-        Args:
-            name: название продукта
-            description: описание продукта
-            price: цена продукта
-            quantity: количество на складе
-            country: страна-производитель
-            germination_period: срок прорастания в днях
-            color: цвет травы
-        """
         super().__init__(name, description, price, quantity)
+        if germination_period <= 0:
+            raise ValueError("Срок прорастания должен быть положительным")
         self.country = country
         self.germination_period = germination_period
         self.color = color
 
     def __str__(self) -> str:
         """Строковое представление газонной травы."""
-        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
+        return (f"{self._name}, {self.color}, из {self.country}, "
+                f"прорастание {self.germination_period} дн., "
+                f"{self._price} руб. Остаток: {self._quantity} шт.")
