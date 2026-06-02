@@ -1,4 +1,4 @@
-from base_product import BaseProduct
+from src.base_product import BaseProduct
 from typing import Dict
 
 class Product(BaseProduct):
@@ -6,10 +6,10 @@ class Product(BaseProduct):
 
     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
         """Инициализирует экземпляр класса Product."""
-        self._name = name
-        self._description = description
-        self._price = 0.0
-        self._quantity = 0
+        self.name = name
+        self.description = description
+        self._price = 0.0  # Приватный атрибут
+        self._quantity = 0  # Приватный атрибут
 
         # Используем сеттеры для валидации
         self.price = price
@@ -34,7 +34,7 @@ class Product(BaseProduct):
 
     # Реализуем абстрактные методы
     def get_name(self) -> str:
-        return self._name
+        return self.name
 
     def get_price(self) -> float:
         return self._price
@@ -52,7 +52,7 @@ class Product(BaseProduct):
         """Устанавливает цену продукта."""
         if value <= 0:
             raise ValueError("Цена должна быть положительной")
-        self._price = value
+        self._price = value  # Записываем в приватный атрибут
 
     @property
     def quantity(self) -> int:
@@ -64,7 +64,7 @@ class Product(BaseProduct):
         """Устанавливает количество продукта."""
         if value < 0:
             raise ValueError("Количество не может быть отрицательным")
-        self._quantity = value
+        self._quantity = value  # Записываем в приватный атрибут
 
     @property
     def total_cost(self) -> float:
@@ -81,7 +81,7 @@ class Product(BaseProduct):
 
     def __str__(self) -> str:
         """Возвращает строковое представление продукта."""
-        return f"{self._name}, {self._price} руб. Остаток: {self._quantity} шт."
+        return f"{self.name}, {self._price} руб. Остаток: {self._quantity} шт."
 
     def __add__(self, other: 'BaseProduct') -> float:
         """Складывает общую стоимость двух продуктов."""
@@ -115,7 +115,7 @@ class Smartphone(Product):
 
     def __str__(self) -> str:
         """Строковое представление смартфона."""
-        return (f"{self._name} {self.model}, {self.memory} ГБ, "
+        return (f"{self.name} {self.model}, {self.memory} ГБ, "
                 f"{self.color}, {self._price} руб. Остаток: {self._quantity} шт.")
 
 
@@ -142,6 +142,6 @@ class LawnGrass(Product):
 
     def __str__(self) -> str:
         """Строковое представление газонной травы."""
-        return (f"{self._name}, {self.color}, из {self.country}, "
+        return (f"{self.name}, {self.color}, из {self.country}, "
                 f"прорастание {self.germination_period} дн., "
                 f"{self._price} руб. Остаток: {self._quantity} шт.")
