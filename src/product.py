@@ -2,6 +2,7 @@ from src.base_product import BaseProduct
 from src.miksin import LoggingMixin
 from typing import Dict
 
+
 class Product(LoggingMixin, BaseProduct):
     """Класс для представления продуктов"""
 
@@ -87,6 +88,7 @@ class Product(LoggingMixin, BaseProduct):
             return NotImplemented
         return self.total_cost + other.total_cost
 
+
 class Smartphone(Product):
     """Класс для представления смартфонов, наследник Product."""
 
@@ -110,8 +112,11 @@ class Smartphone(Product):
         self.color = color
 
     def __str__(self) -> str:
-        return (f"{self.name} {self.model}, {self.memory} ГБ, "
-                f"{self.color}, {self._price} руб. Остаток: {self._quantity} шт.")
+        return (
+            f"{self.name} {self.model}, {self.memory} ГБ, "
+            f"{self.color}, {self._price} руб. Остаток: {self._quantity} шт."
+        )
+
 
 class LawnGrass(Product):
     """Класс для представления газонной травы, наследник Product."""
@@ -134,6 +139,8 @@ class LawnGrass(Product):
         self.color = color
 
     def __str__(self) -> str:
-        return (f"{self.name}, {self.color}, из {self.country}, "
-                f"прорастание {self.germination_period} дн., "
-                f"{self._price} руб. Остаток: {self._quantity} шт.")
+        return (
+            f"{self.name}, {self.color}, из {self.country}, "
+            f"прорастание {self.germination_period} дн., "
+            f"{self._price} руб. Остаток: {self._quantity} шт."
+        )
