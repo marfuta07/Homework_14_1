@@ -7,6 +7,7 @@ class Product(LoggingMixin, BaseProduct):
     """Класс для представления продуктов"""
 
     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
+
         """Инициализирует экземпляр класса Product."""
         self.name = name
         self.description = description

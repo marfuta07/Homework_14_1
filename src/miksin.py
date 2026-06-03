@@ -5,6 +5,7 @@ class LoggingMixin:
     """
 
     def __init__(self, *args, **kwargs):
+
         # Получаем имя класса
         class_name = self.__class__.__name__
 
