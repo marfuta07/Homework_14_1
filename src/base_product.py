@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class BaseProduct(ABC):
     """
     Абстрактный базовый класс для всех продуктов.
@@ -37,7 +38,7 @@ class BaseProduct(ABC):
         pass
 
     @abstractmethod
-    def __add__(self, other: 'BaseProduct') -> float:
+    def __add__(self, other: "BaseProduct") -> float:
         """
         Складывает общую стоимость двух продуктов.
 

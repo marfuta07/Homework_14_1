@@ -1,10 +1,11 @@
+from typing import Any
 class LoggingMixin:
     """
     Миксин для логирования создания объектов.
     Печатает информацию о классе и параметрах при инициализации.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
 
         # Получаем имя класса
         class_name = self.__class__.__name__
@@ -20,10 +21,10 @@ class LoggingMixin:
         # Вызываем следующий конструктор в цепочке наследования
         super().__init__(*args, **kwargs)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         Возвращает строковое представление объекта, которое можно использовать
         для воссоздания объекта.
         """
-        args_repr = [repr(getattr(self, attr)) for attr in self.__dict__ if not attr.startswith('_')]
+        args_repr = [repr(getattr(self, attr)) for attr in self.__dict__ if not attr.startswith("_")]
         return f"{self.__class__.__name__}({', '.join(args_repr)})"

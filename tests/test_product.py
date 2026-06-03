@@ -1,6 +1,7 @@
 from src.category import Category
 from src.product import Smartphone, LawnGrass, Product
 import pytest
+import math
 from typing import List, Generator, Any
 from src.base_product import BaseProduct
 from src.miksin import LoggingMixin
@@ -142,7 +143,6 @@ def test_total_cost_property(sample_product: Product) -> None:
     assert sample_product.total_cost == expected_total
 
 
-import math
 def test_apply_discount_positive(sample_product: Product) -> None:
     """Проверка применения скидки (20 %)"""
     original_price = sample_product.price
@@ -397,31 +397,29 @@ def test_category_add_product_invalid_types() -> None:
     assert Category.product_count == 0
 
 
-#--Тесты Множественное наследование--
+# --Тесты Множественное наследование--
 
 
 def test_base_product_cannot_be_instantiated() -> None:
     """Проверка, что BaseProduct нельзя создать как экземпляр"""
     with pytest.raises(TypeError, match="Can't instantiate abstract class"):
-        BaseProduct()
+        BaseProduct()# type: ignore[abstract]
 
 
 def test_base_product_abstract_methods() -> None:
     """Проверка наличия абстрактных методов"""
-    abstract_methods = [
-        'get_name',
-        'get_price',
-        'get_quantity'
-    ]
+    abstract_methods = ["get_name", "get_price", "get_quantity"]
     for method in abstract_methods:
         assert hasattr(BaseProduct, method)
         # Проверяем, что метод помечен как абстрактный
         assert getattr(BaseProduct, method).__isabstractmethod__
 
+
 def test_cannot_instantiate_base_product() -> None:
     """Проверка невозможности создания экземпляра абстрактного класса"""
     with pytest.raises(TypeError, match="Can't instantiate abstract class"):
-        BaseProduct()
+        BaseProduct()# type: ignore[abstract]
+
 
 def test_concrete_class_implements_abstract_methods(sample_product: Product) -> None:
     """Проверка, что конкретный класс реализует все абстрактные методы"""
@@ -434,25 +432,27 @@ def test_concrete_class_implements_abstract_methods(sample_product: Product) -> 
     assert sample_product.get_quantity() == 10
 
 
-
-
-
-
 def test_product_inherits_from_base_product() -> None:
     """Проверка наследования Product от BaseProduct"""
     from src.product import Product
     from src.base_product import BaseProduct
+
     assert issubclass(Product, BaseProduct)
+
 
 def test_smartphone_inherits_from_product() -> None:
     """Проверка наследования Smartphone от Product"""
     from src.product import Smartphone, Product
+
     assert issubclass(Smartphone, Product)
+
 
 def test_lawn_grass_inherits_from_product() -> None:
     """Проверка наследования LawnGrass от Product"""
     from src.product import LawnGrass, Product
+
     assert issubclass(LawnGrass, Product)
+
 
 def test_all_products_have_logging_mixin() -> None:
     """Проверяет, что все продукты используют LoggingMixin"""
@@ -461,13 +461,11 @@ def test_all_products_have_logging_mixin() -> None:
         assert LoggingMixin in cls.__mro__, f"Класс {cls.__name__} не наследует LoggingMixin"
 
 
-
-
-
 def test_abstract_method_not_implemented() -> None:
     """Проверка ошибки при отсутствии реализации абстрактного метода"""
+
     class IncompleteProduct(BaseProduct):
         pass  # Не реализует абстрактные методы
 
     with pytest.raises(TypeError, match="Can't instantiate abstract class"):
-        IncompleteProduct()
+        IncompleteProduct()# type: ignore[abstract]

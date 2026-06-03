@@ -1,13 +1,12 @@
 from src.base_product import BaseProduct
 from src.miksin import LoggingMixin
-from typing import Dict
+from typing import Dict, Any
 
 
 class Product(LoggingMixin, BaseProduct):
     """Класс для представления продуктов"""
 
     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
-
         """Инициализирует экземпляр класса Product."""
         self.name = name
         self.description = description
@@ -19,7 +18,7 @@ class Product(LoggingMixin, BaseProduct):
         self.quantity = quantity
 
     @classmethod
-    def new_product(cls, product_data: Dict[str, any]) -> "Product":
+    def new_product(cls, product_data: Dict[str, Any]) -> "Product":
         """Создаёт новый объект Product из словаря с данными."""
         required_keys = ["name", "description", "price", "quantity"]
         missing_keys = [key for key in required_keys if key not in product_data]
@@ -83,10 +82,14 @@ class Product(LoggingMixin, BaseProduct):
         """Возвращает строковое представление продукта."""
         return f"{self.name}, {self._price} руб. Остаток: {self._quantity} шт."
 
-    def __add__(self, other: "BaseProduct") -> float:
+    def __add__(self, other: object) -> float:
         """Складывает общую стоимость двух продуктов."""
-        if not isinstance(other, BaseProduct):
+        if not isinstance(other, Product):
             return NotImplemented
+        if not hasattr(other, "total_cost"):
+            raise AttributeError(
+                f"Объект {type(other).__name__} не имеет атрибута total_cost"
+            )
         return self.total_cost + other.total_cost
 
 
