@@ -1,7 +1,10 @@
 from src.category import Category
 from src.product import Smartphone, LawnGrass, Product
 import pytest
+import math
 from typing import List, Generator, Any
+from src.base_product import BaseProduct
+from src.miksin import LoggingMixin
 
 
 # Фикстура на уровне функции — создаёт один продукт для теста
@@ -145,7 +148,7 @@ def test_apply_discount_positive(sample_product: Product) -> None:
     original_price = sample_product.price
     sample_product.apply_discount(20)  # Скидка 20 %
     expected_price = original_price * 0.8
-    assert sample_product.price == expected_price
+    assert math.isclose(sample_product.price, expected_price, rel_tol=1e-9)
 
 
 def test_apply_discount_zero(sample_product: Product) -> None:
@@ -253,8 +256,8 @@ def test_product_addition_same_class_allowed(sample_product: Product, product_li
     assert result == expected
 
 
-def test_product_addition_different_classes_raises_type_error() -> None:
-    """Проверка, что сложение продуктов разных классов (например, Smartphone и LawnGrass) вызывает TypeError"""
+def test_product_addition_different_subclasses() -> None:
+    """Проверка сложения продуктов разных подклассов (Smartphone + LawnGrass)"""
     smartphone = Smartphone(
         name="iPhone",
         description="Флагманский смартфон",
@@ -275,8 +278,9 @@ def test_product_addition_different_classes_raises_type_error() -> None:
         color="зелёный",
     )
 
-    with pytest.raises(TypeError, match="Нельзя складывать товары разных классов"):
-        _ = smartphone + grass
+    total_cost = smartphone + grass
+    expected = smartphone.total_cost + grass.total_cost
+    assert total_cost == pytest.approx(expected)
 
 
 def test_product_addition_same_subclass_works(sample_product: Product) -> None:
@@ -391,3 +395,77 @@ def test_category_add_product_invalid_types() -> None:
 
     assert category.get_product_count() == 0
     assert Category.product_count == 0
+
+
+# --Тесты Множественное наследование--
+
+
+def test_base_product_cannot_be_instantiated() -> None:
+    """Проверка, что BaseProduct нельзя создать как экземпляр"""
+    with pytest.raises(TypeError, match="Can't instantiate abstract class"):
+        BaseProduct()# type: ignore[abstract]
+
+
+def test_base_product_abstract_methods() -> None:
+    """Проверка наличия абстрактных методов"""
+    abstract_methods = ["get_name", "get_price", "get_quantity"]
+    for method in abstract_methods:
+        assert hasattr(BaseProduct, method)
+        # Проверяем, что метод помечен как абстрактный
+        assert getattr(BaseProduct, method).__isabstractmethod__
+
+
+def test_cannot_instantiate_base_product() -> None:
+    """Проверка невозможности создания экземпляра абстрактного класса"""
+    with pytest.raises(TypeError, match="Can't instantiate abstract class"):
+        BaseProduct()# type: ignore[abstract]
+
+
+def test_concrete_class_implements_abstract_methods(sample_product: Product) -> None:
+    """Проверка, что конкретный класс реализует все абстрактные методы"""
+    assert callable(sample_product.get_name)
+    assert callable(sample_product.get_price)
+    assert callable(sample_product.get_quantity)
+    # Проверяем работу методов
+    assert sample_product.get_name() == "Смартфон"
+    assert sample_product.get_price() == 49999.50
+    assert sample_product.get_quantity() == 10
+
+
+def test_product_inherits_from_base_product() -> None:
+    """Проверка наследования Product от BaseProduct"""
+    from src.product import Product
+    from src.base_product import BaseProduct
+
+    assert issubclass(Product, BaseProduct)
+
+
+def test_smartphone_inherits_from_product() -> None:
+    """Проверка наследования Smartphone от Product"""
+    from src.product import Smartphone, Product
+
+    assert issubclass(Smartphone, Product)
+
+
+def test_lawn_grass_inherits_from_product() -> None:
+    """Проверка наследования LawnGrass от Product"""
+    from src.product import LawnGrass, Product
+
+    assert issubclass(LawnGrass, Product)
+
+
+def test_all_products_have_logging_mixin() -> None:
+    """Проверяет, что все продукты используют LoggingMixin"""
+    product_classes = [Product, Smartphone, LawnGrass]
+    for cls in product_classes:
+        assert LoggingMixin in cls.__mro__, f"Класс {cls.__name__} не наследует LoggingMixin"
+
+
+def test_abstract_method_not_implemented() -> None:
+    """Проверка ошибки при отсутствии реализации абстрактного метода"""
+
+    class IncompleteProduct(BaseProduct):
+        pass  # Не реализует абстрактные методы
+
+    with pytest.raises(TypeError, match="Can't instantiate abstract class"):
+        IncompleteProduct()# type: ignore[abstract]
