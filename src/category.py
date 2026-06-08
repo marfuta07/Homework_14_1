@@ -57,10 +57,9 @@ class Category:
         Returns:
             Список строк с информацией о товарах категории
         """
-        product_str = " "
+        product_str = ""
         for product in self.__products:
             product_str += f"{str(product)}\n"
-
         return product_str
 
     def get_product_count(self) -> int:
@@ -71,6 +70,20 @@ class Category:
             Количество товаров в категории
         """
         return len(self.__products)
+
+    def middle_price(self) -> float:
+        """
+        Вычисляет среднюю цену товаров в категории.
+
+        Returns:
+            Средняя цена всех товаров в категории. Если товаров нет, возвращает 0.0.
+        """
+        try:
+            total_price = sum(product.get_price() for product in self.__products)
+            average_price = total_price / len(self.__products)
+            return round(average_price, 2)
+        except ZeroDivisionError:
+            return 0.0
 
     def __str__(self) -> str:
         """Строковое представление категории."""

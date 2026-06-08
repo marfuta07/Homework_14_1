@@ -61,8 +61,8 @@ class Product(LoggingMixin, BaseProduct):
     @quantity.setter
     def quantity(self, value: int) -> None:
         """Устанавливает количество продукта."""
-        if value < 0:
-            raise ValueError("Количество не может быть отрицательным")
+        if value <= 0:
+            raise ValueError("Товар с нулевым количеством не может быть добавлен")
         self._quantity = value  # Записываем в приватный атрибут
 
     @property
@@ -91,6 +91,7 @@ class Product(LoggingMixin, BaseProduct):
                 f"Объект {type(other).__name__} не имеет атрибута total_cost"
             )
         return self.total_cost + other.total_cost
+
 
 
 class Smartphone(Product):
