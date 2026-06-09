@@ -181,9 +181,6 @@ def test_negative_quantity_validation() -> None:
         Product("Товар", "Описание", 100.0, -5)
 
 
-
-
-
 # ---Тесты для новых функций---
 
 
@@ -198,7 +195,6 @@ def test_product_str_with_positive_quantity() -> None:
     product = Product("Товар", "Описание", 1500.0, 5)
     result = str(product)
     assert result == "Товар, 1500.0 руб. Остаток: 5 шт."
-
 
 
 def test_product_str_with_fractional_price() -> None:
@@ -401,7 +397,7 @@ def test_category_add_product_invalid_types() -> None:
 def test_base_product_cannot_be_instantiated() -> None:
     """Проверка, что BaseProduct нельзя создать как экземпляр"""
     with pytest.raises(TypeError, match="Can't instantiate abstract class"):
-        BaseProduct()# type: ignore[abstract]
+        BaseProduct()  # type: ignore[abstract]
 
 
 def test_base_product_abstract_methods() -> None:
@@ -416,7 +412,7 @@ def test_base_product_abstract_methods() -> None:
 def test_cannot_instantiate_base_product() -> None:
     """Проверка невозможности создания экземпляра абстрактного класса"""
     with pytest.raises(TypeError, match="Can't instantiate abstract class"):
-        BaseProduct()# type: ignore[abstract]
+        BaseProduct()  # type: ignore[abstract]
 
 
 def test_concrete_class_implements_abstract_methods(sample_product: Product) -> None:
@@ -466,10 +462,10 @@ def test_abstract_method_not_implemented() -> None:
         pass  # Не реализует абстрактные методы
 
     with pytest.raises(TypeError, match="Can't instantiate abstract class"):
-        IncompleteProduct()# type: ignore[abstract]
+        IncompleteProduct()  # type: ignore[abstract]
 
 
-#--Тесты по теме исключения--
+# --Тесты по теме исключения--
 
 
 class TestProduct:
@@ -489,7 +485,6 @@ class TestProduct:
             Product("Товар", "Описание", 1000.0, 0)
         assert str(exc_info.value) == "Товар с нулевым количеством не может быть добавлен"
 
-
     def test_create_product_with_negative_quantity_raises_value_error(self):
         """Тест: создание товара с отрицательным количеством вызывает ValueError"""
         with pytest.raises(ValueError):
@@ -501,7 +496,6 @@ class TestProduct:
         with pytest.raises(ValueError) as exc_info:
             product.quantity = 0
         assert str(exc_info.value) == "Товар с нулевым количеством не может быть добавлен"
-
 
     def test_set_quantity_to_negative_raises_value_error(self):
         """Тест: установка отрицательного количества через сеттер вызывает ValueError"""

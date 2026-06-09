@@ -89,11 +89,8 @@ class Product(LoggingMixin, BaseProduct):
         if not isinstance(other, Product):
             return NotImplemented
         if not hasattr(other, "total_cost"):
-            raise AttributeError(
-                f"Объект {type(other).__name__} не имеет атрибута total_cost"
-            )
+            raise AttributeError(f"Объект {type(other).__name__} не имеет атрибута total_cost")
         return self.total_cost + other.total_cost
-
 
 
 class Smartphone(Product):
