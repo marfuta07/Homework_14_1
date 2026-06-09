@@ -181,10 +181,7 @@ def test_negative_quantity_validation() -> None:
         Product("Товар", "Описание", 100.0, -5)
 
 
-def test_zero_quantity_allowed() -> None:
-    """Проверка, что нулевое количество разрешено"""
-    product = Product("Нет в наличии", "Описание", 100.0, 0)
-    assert product.quantity == 0
+
 
 
 # ---Тесты для новых функций---
@@ -196,11 +193,12 @@ def test_product_str_representation(sample_product: Product) -> None:
     assert result == "Смартфон, 49999.5 руб. Остаток: 10 шт."
 
 
-def test_product_str_with_zero_quantity() -> None:
-    """Проверка строкового представления продукта с нулевым количеством"""
-    product = Product("Товар", "Описание", 1500.0, 0)
+def test_product_str_with_positive_quantity() -> None:
+    """Проверка строкового представления продукта с положительным количеством"""
+    product = Product("Товар", "Описание", 1500.0, 5)
     result = str(product)
-    assert result == "Товар, 1500.0 руб. Остаток: 0 шт."
+    assert result == "Товар, 1500.0 руб. Остаток: 5 шт."
+
 
 
 def test_product_str_with_fractional_price() -> None:

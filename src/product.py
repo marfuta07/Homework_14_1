@@ -61,9 +61,11 @@ class Product(LoggingMixin, BaseProduct):
     @quantity.setter
     def quantity(self, value: int) -> None:
         """Устанавливает количество продукта."""
-        if value <= 0:
+        if value < 0:
+            raise ValueError("Количество не может быть отрицательным")
+        elif value == 0:
             raise ValueError("Товар с нулевым количеством не может быть добавлен")
-        self._quantity = value  # Записываем в приватный атрибут
+        self._quantity = value
 
     @property
     def total_cost(self) -> float:

@@ -194,9 +194,7 @@ def test_products_string_empty_category() -> None:
     """Проверка строкового представления пустой категории"""
     category = Category("Пустая", "Без товаров", [])
     products_str = category.products
-    # В текущей реализации при пустом списке возвращается строка с пробелом
-    # Если вы хотите изменить это — нужно править метод products в классе
-    assert products_str == " "
+    assert products_str == ""
 
 
 def test_products_string_single_product() -> None:
@@ -248,16 +246,16 @@ def test_category_str_after_adding_product(sample_products: List[Product]) -> No
     # Теперь общее количество: 10 + 5 + 20 = 35 шт.
     assert str(category) == "Электроника, количество продуктов: 35 шт."
 
-
 def test_category_str_with_zero_quantity_products() -> None:
     """Проверка строкового представления, когда у товаров нулевое количество"""
     products = [
-        Product("Смартфон", "Мощный смартфон", 49999.50, 0),
-        Product("Ноутбук", "Игровой ноутбук", 79999.99, 0),
+        Product("Смартфон", "Мощный смартфон", 49999.50, 1),
+        Product("Ноутбук", "Игровой ноутбук", 79999.99, 1),
     ]
     category = Category("Склад", "Товары на складе", products)
     result = str(category)
-    assert result == "Склад, количество продуктов: 0 шт."
+    assert result == "Склад, количество продуктов: 2 шт."
+
 
 
 # --Тесты наследования--
