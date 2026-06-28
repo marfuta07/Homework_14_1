@@ -194,9 +194,7 @@ def test_products_string_empty_category() -> None:
     """Проверка строкового представления пустой категории"""
     category = Category("Пустая", "Без товаров", [])
     products_str = category.products
-    # В текущей реализации при пустом списке возвращается строка с пробелом
-    # Если вы хотите изменить это — нужно править метод products в классе
-    assert products_str == " "
+    assert products_str == ""
 
 
 def test_products_string_single_product() -> None:
@@ -252,12 +250,12 @@ def test_category_str_after_adding_product(sample_products: List[Product]) -> No
 def test_category_str_with_zero_quantity_products() -> None:
     """Проверка строкового представления, когда у товаров нулевое количество"""
     products = [
-        Product("Смартфон", "Мощный смартфон", 49999.50, 0),
-        Product("Ноутбук", "Игровой ноутбук", 79999.99, 0),
+        Product("Смартфон", "Мощный смартфон", 49999.50, 1),
+        Product("Ноутбук", "Игровой ноутбук", 79999.99, 1),
     ]
     category = Category("Склад", "Товары на складе", products)
     result = str(category)
-    assert result == "Склад, количество продуктов: 0 шт."
+    assert result == "Склад, количество продуктов: 2 шт."
 
 
 # --Тесты наследования--
@@ -355,3 +353,84 @@ def test_init_with_invalid_object_in_products_list() -> None:
 
     with pytest.raises(TypeError, match="Можно добавлять только объекты класса Product"):
         Category("Ошибка", "Описание", [valid_product, "не продукт"])  # type: ignore
+
+
+# --Тесты по теме исключения--
+
+
+class TestCategory:
+    """Тесты для класса Category"""
+
+    def test_create_category_with_products(self)->None:
+        """Тест: создание категории с товарами увеличивает счётчики"""
+        product1 = Product("Товар 1", "Описание 1", 100.0, 2)
+        product2 = Product("Товар 2", "Описание 2", 200.0, 3)
+
+        category = Category("Тесты", "Категория для тестирования", [product1, product2])
+
+        assert category.name == "Тесты"
+        assert category.description == "Категория для тестирования"
+        assert len(category.products_list) == 2
+        assert Category.category_count >= 1
+        assert Category.product_count >= 2
+
+    def test_create_empty_category(self)->None:
+        """Тест: создание пустой категории работает корректно"""
+        category = Category("Пустая", "Пустая категория", [])
+        assert category.get_product_count() == 0
+        assert len(category.products_list) == 0
+
+    def test_add_product_to_category(self)->None:
+        """Тест: добавление товара в категорию работает корректно"""
+        category = Category("Тесты", "Категория для тестирования")
+        product = Product("Новый товар", "Описание", 500.0, 4)
+
+        category.add_product(product)
+
+        assert len(category.products_list) == 1
+        assert product in category.products_list
+        assert Category.product_count >= 1
+
+    def test_add_invalid_object_to_category_raises_type_error(self)->None:
+        """Тест: попытка добавить не-продукт вызывает TypeError"""
+        category = Category("Тесты", "Категория для тестирования")
+
+        with pytest.raises(TypeError):
+            category.add_product("Не товар") # type: ignore
+
+    def test_middle_price_with_products(self)->None:
+        """Тест: middle_price корректно вычисляет среднюю цену для категории с товарами"""
+        product1 = Product("Товар 1", "Описание 1", 100.0, 2)
+        product2 = Product("Товар 2", "Описание 2", 200.0, 3)
+        product3 = Product("Товар 3", "Описание 3", 300.0, 1)
+
+        category = Category("Тесты", "Категория с товарами", [product1, product2, product3])
+        average_price = category.middle_price()
+
+        expected_average = (100 + 200 + 300) / 3
+        assert average_price == round(expected_average, 2)
+
+    def test_middle_price_with_empty_category_returns_zero(self)->None:
+        """Тест: middle_price возвращает 0.0 для пустой категории"""
+        category = Category("Пустая", "Пустая категория", [])
+        average_price = category.middle_price()
+        assert average_price == 0.0
+
+    def test_products_property_format(self)->None:
+        """Тест: свойство products возвращает корректно отформатированную строку"""
+        product1 = Product("Товар 1", "Описание 1", 100.0, 2)
+        product2 = Product("Товар 2", "Описание 2", 200.0, 3)
+
+        category = Category("Тесты", "Категория для тестирования", [product1, product2])
+        products_str = category.products
+
+        assert "Товар 1, 100.0 руб. Остаток: 2 шт." in products_str
+        assert "Товар 2, 200.0 руб. Остаток: 3 шт." in products_str
+
+    def test_get_product_count(self)->None:
+        """Тест: get_product_count возвращает корректное количество товаров"""
+        product1 = Product("Товар 1", "Описание 1", 100.0, 2)
+        product2 = Product("Товар 2", "Описание 2", 200.0, 3)
+
+        category = Category("Тесты", "Категория для тестирования", [product1, product2])
+        assert category.get_product_count() == 2

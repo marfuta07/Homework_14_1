@@ -63,7 +63,9 @@ class Product(LoggingMixin, BaseProduct):
         """Устанавливает количество продукта."""
         if value < 0:
             raise ValueError("Количество не может быть отрицательным")
-        self._quantity = value  # Записываем в приватный атрибут
+        elif value == 0:
+            raise ValueError("Товар с нулевым количеством не может быть добавлен")
+        self._quantity = value
 
     @property
     def total_cost(self) -> float:
@@ -87,9 +89,7 @@ class Product(LoggingMixin, BaseProduct):
         if not isinstance(other, Product):
             return NotImplemented
         if not hasattr(other, "total_cost"):
-            raise AttributeError(
-                f"Объект {type(other).__name__} не имеет атрибута total_cost"
-            )
+            raise AttributeError(f"Объект {type(other).__name__} не имеет атрибута total_cost")
         return self.total_cost + other.total_cost
 
 

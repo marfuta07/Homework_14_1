@@ -181,12 +181,6 @@ def test_negative_quantity_validation() -> None:
         Product("Товар", "Описание", 100.0, -5)
 
 
-def test_zero_quantity_allowed() -> None:
-    """Проверка, что нулевое количество разрешено"""
-    product = Product("Нет в наличии", "Описание", 100.0, 0)
-    assert product.quantity == 0
-
-
 # ---Тесты для новых функций---
 
 
@@ -196,11 +190,11 @@ def test_product_str_representation(sample_product: Product) -> None:
     assert result == "Смартфон, 49999.5 руб. Остаток: 10 шт."
 
 
-def test_product_str_with_zero_quantity() -> None:
-    """Проверка строкового представления продукта с нулевым количеством"""
-    product = Product("Товар", "Описание", 1500.0, 0)
+def test_product_str_with_positive_quantity() -> None:
+    """Проверка строкового представления продукта с положительным количеством"""
+    product = Product("Товар", "Описание", 1500.0, 5)
     result = str(product)
-    assert result == "Товар, 1500.0 руб. Остаток: 0 шт."
+    assert result == "Товар, 1500.0 руб. Остаток: 5 шт."
 
 
 def test_product_str_with_fractional_price() -> None:
@@ -403,7 +397,7 @@ def test_category_add_product_invalid_types() -> None:
 def test_base_product_cannot_be_instantiated() -> None:
     """Проверка, что BaseProduct нельзя создать как экземпляр"""
     with pytest.raises(TypeError, match="Can't instantiate abstract class"):
-        BaseProduct()# type: ignore[abstract]
+        BaseProduct()  # type: ignore[abstract]
 
 
 def test_base_product_abstract_methods() -> None:
@@ -418,7 +412,7 @@ def test_base_product_abstract_methods() -> None:
 def test_cannot_instantiate_base_product() -> None:
     """Проверка невозможности создания экземпляра абстрактного класса"""
     with pytest.raises(TypeError, match="Can't instantiate abstract class"):
-        BaseProduct()# type: ignore[abstract]
+        BaseProduct()  # type: ignore[abstract]
 
 
 def test_concrete_class_implements_abstract_methods(sample_product: Product) -> None:
@@ -468,4 +462,76 @@ def test_abstract_method_not_implemented() -> None:
         pass  # Не реализует абстрактные методы
 
     with pytest.raises(TypeError, match="Can't instantiate abstract class"):
-        IncompleteProduct()# type: ignore[abstract]
+        IncompleteProduct()  # type: ignore[abstract]
+
+
+# --Тесты по теме исключения--
+
+
+class TestProduct:
+    """Тесты для класса Product"""
+
+    def test_create_product_with_valid_data(self)->None:
+        """Тест: создание товара с корректными данными проходит успешно"""
+        product = Product("Смартфон", "Новый смартфон", 50000.0, 10)
+        assert product.name == "Смартфон"
+        assert product.description == "Новый смартфон"
+        assert product.get_price() == 50000.0
+        assert product.get_quantity() == 10
+
+    def test_create_product_with_zero_quantity_raises_value_error(self)->None:
+        """Тест: создание товара с нулевым количеством вызывает ValueError"""
+        with pytest.raises(ValueError) as exc_info:
+            Product("Товар", "Описание", 1000.0, 0)
+        assert str(exc_info.value) == "Товар с нулевым количеством не может быть добавлен"
+
+    def test_create_product_with_negative_quantity_raises_value_error(self)->None:
+        """Тест: создание товара с отрицательным количеством вызывает ValueError"""
+        with pytest.raises(ValueError):
+            Product("Товар", "Описание", 1000.0, -5)
+
+    def test_set_quantity_to_zero_raises_value_error(self)->None:
+        """Тест: установка количества в ноль через сеттер вызывает ValueError"""
+        product = Product("Товар", "Описание", 1000.0, 5)
+        with pytest.raises(ValueError) as exc_info:
+            product.quantity = 0
+        assert str(exc_info.value) == "Товар с нулевым количеством не может быть добавлен"
+
+    def test_set_quantity_to_negative_raises_value_error(self)->None:
+        """Тест: установка отрицательного количества через сеттер вызывает ValueError"""
+        product = Product("Товар", "Описание", 1000.0, 5)
+        with pytest.raises(ValueError):
+            product.quantity = -3
+
+    def test_set_valid_quantity_through_setter(self)->None:
+        """Тест: установка корректного количества через сеттер работает"""
+        product = Product("Товар", "Описание", 1000.0, 5)
+        product.quantity = 15
+        assert product.quantity == 15
+        assert product.get_quantity() == 15
+
+    def test_create_product_with_positive_price(self)->None:
+        """Тест: создание товара с положительной ценой проходит успешно"""
+        product = Product("Товар", "Описание", 1500.0, 3)
+        assert product.get_price() == 1500.0
+
+    def test_create_product_with_zero_price_raises_value_error(self)->None:
+        """Тест: создание товара с нулевой ценой вызывает ValueError"""
+        with pytest.raises(ValueError):
+            Product("Товар", "Описание", 0.0, 5)
+
+    def test_create_product_with_negative_price_raises_value_error(self)->None:
+        """Тест: создание товара с отрицательной ценой вызывает ValueError"""
+        with pytest.raises(ValueError):
+            Product("Товар", "Описание", -100.0, 5)
+
+    def test_total_cost_calculation(self)->None:
+        """Тест: корректное вычисление общей стоимости товара"""
+        product = Product("Товар", "Описание", 1000.0, 5)
+        assert product.total_cost == 5000.0
+
+    def test_apply_discount(self)->None:
+        """Тест: применение скидки корректно изменяет цену"""
+        product = Product("Товар", "Описание", 1000.0, 5)
+        product.apply_discount(10)  # скидка 10%
+        assert product.get_price() == 900.0
